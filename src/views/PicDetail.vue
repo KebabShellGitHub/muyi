@@ -9,7 +9,7 @@ import axios from "axios"; // 引入axios
 
 export default {
   name: "PicDetail",
-  mounted() {
+  created() {
     // axios
     //   .get("/mock/pics")
     //   .then(res => {

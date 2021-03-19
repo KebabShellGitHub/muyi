@@ -18,7 +18,14 @@
             <a-avatar size="small" style="backgroundColor:#87d068" icon="user"
             />
           </router-link>
-          <div v-else>sign in/sign up</div>
+          <div v-else>
+            <a-button type="link" @click="toLogin()">
+              登录
+            </a-button>
+            <a-button @click="toRegister()">
+              注册
+            </a-button>
+          </div>
         </div>
         <a-menu
             theme="light"
@@ -30,10 +37,10 @@
             <router-link to="/">首页</router-link>
           </a-menu-item>
           <a-menu-item key="2">
-            <router-link to="/all">全部</router-link>
+            <router-link to="/hot">热门</router-link>
           </a-menu-item>
           <a-menu-item key="3">
-            <router-link to="/hot">热门</router-link>
+            <router-link to="/all">全部</router-link>
           </a-menu-item>
           <a-menu-item key="4">
             <router-link to="/category">分类</router-link>
@@ -67,13 +74,13 @@ export default {
       }
     };
   },
-  mounted() {
+  created() {
     // 验证用户是否登录及token的验证及拿到user的信息
     let token = sessionStorage.getItem("Token");
     if (token && this.tokenVerify(token)) {
       this.loginFlag = true;
       this.getUser(token);
-    }else {
+    } else {
       this.loginFlag = false;
     }
   },
@@ -87,6 +94,12 @@ export default {
     },
     tokenVerify(token) {
       return true;
+    },
+    toLogin(){
+      this.$router.push('/login')
+    },
+    toRegister(){
+      this.$router.push('/register')
     }
   }
 }

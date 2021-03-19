@@ -163,7 +163,7 @@ export default {
       hotAuthors: []
     };
   },
-  mounted() {
+  created() {
     this.getCarPics();
     this.getRecPics();
     this.getHotPics();
@@ -271,6 +271,7 @@ export default {
     },
     // 拿到3个热门分类信息，再拿到分类下的热门图片
     getHotSorts() {
+      // console.log('hotSorts');
       this.hotSorts = [
         {
           id: 0,

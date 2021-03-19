@@ -1,41 +1,193 @@
 <template>
-  <div class="hot">
-    <a-list item-layout="horizontal" :data-source="data">
-      <a-list-item slot="renderItem" slot-scope="item">
-        <a-list-item-meta
-          description="Ant Design, a design language for background applications, is refined by Ant UED Team"
-        >
-          <a slot="title" href="https://www.antdv.com/">{{ item.title }}</a>
-          <a-avatar
+  <div style="text-align: center">
+    <a-card v-for="item in pics" :key="item.picId" hoverable style="width: 400px" class="card">
+      <img slot="cover" alt="example" :src="item.thumbPic"  @click="toPicDetail(item.picId)"/>
+      <a-card-meta :title="item.authorName" :description="item.authorDesc">
+        <a-avatar
             slot="avatar"
-            src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"
-          />
-        </a-list-item-meta>
-      </a-list-item>
-    </a-list>
+            :src="item.thumbAvatar"
+            @click="toAuthorDetail(item.authorId)"
+        />
+      </a-card-meta>
+      <div style="margin-top: 20px;">
+        <div class="carPart">
+          <a-icon type="eye" /> {{ item.hitCount }}
+        </div>
+        <div class="carPart">
+          <a-icon type="file-text" /> {{ item.commCount }}
+        </div>
+        <div class="carPart">
+          <a-icon type="like" /> {{ item.likeCount }}
+        </div>
+      </div>
+    </a-card>
+    <div>
+      <a-button @click="getMorePics(1)">more</a-button>
+    </div>
+
   </div>
 </template>
+
 <script>
-const data = [
-  {
-    title: "Ant Design Title 1"
-  },
-  {
-    title: "Ant Design Title 2"
-  },
-  {
-    title: "Ant Design Title 3"
-  },
-  {
-    title: "Ant Design Title 4"
-  }
-];
 export default {
+  name: "Hot",
   data() {
     return {
-      data
-    };
+      pics: [
+        {
+          picId: 1,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        },
+      ]
+    }
+  },
+  created() {
+    this.getPics(1);
+  },
+  methods: {
+    // 拿到count数目的图片
+    getPics(count){
+      this.pics = [
+        {
+          picId: 1,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        },
+        {
+          picId: 2,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        },
+        {
+          picId: 3,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        },
+        {
+          picId: 4,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        },
+        {
+          picId: 5,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        },
+        {
+          picId: 6,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        },
+      ]
+    },
+    // 拿到count数目的图片
+    getMorePics(count){
+      let morePics = [
+        {
+          picId: 7,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        },
+        {
+          picId: 8,
+          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
+          authorName: 'author',
+          authorId: 0,
+          authorDesc: 'description',
+          hitCount: 3,
+          commCount: 3,
+          likeCount: 3
+        }
+      ];
+      this.pics.push.apply(this.pics, morePics);
+    },
+    // 跳转到具体图片页面
+    toPicDetail(picId) {
+      console.log(picId);
+      this.$router.push({
+        name: 'PicDetail',
+        params: {
+          id: picId
+        }
+      })
+    },
+    // 跳转到作者页面
+    toAuthorDetail(authorId) {
+      console.log(authorId);
+      this.$router.push({
+        name: 'Author',
+        params: {
+          id: authorId
+        }
+      })
+    }
   }
 };
 </script>
-<style></style>
+
+<style scoped>
+.card {
+  display: inline-block;
+  margin: 20px;
+  overflow: auto;
+}
+
+.ant-card-cover img {
+  object-fit: cover;
+  height: 250px;
+}
+.carPart {
+  display: inline;
+  margin: 10px;
+}
+</style>
