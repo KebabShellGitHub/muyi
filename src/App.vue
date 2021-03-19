@@ -1,32 +1,110 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
-  </div>
+  <a-layout class="layout">
+    <a-layout-header
+        :style="{
+        position: 'fixed',
+        zIndex: 1,
+        width: '100%',
+        backgroundColor: 'white'
+      }"
+    >
+      <div class="ant-row">
+        <div class="header-logo">
+          <h1>木易 MUYI</h1>
+        </div>
+        <div class="header-user">
+          <router-link v-if="loginFlag" to="/user"
+          >
+            <a-avatar size="small" style="backgroundColor:#87d068" icon="user"
+            />
+          </router-link>
+          <div v-else>sign in/sign up</div>
+        </div>
+        <a-menu
+            theme="light"
+            mode="horizontal"
+            :default-selected-keys="['1']"
+            :style="{ lineHeight: '64px' }"
+        >
+          <a-menu-item key="1">
+            <router-link to="/">首页</router-link>
+          </a-menu-item>
+          <a-menu-item key="2">
+            <router-link to="/all">全部</router-link>
+          </a-menu-item>
+          <a-menu-item key="3">
+            <router-link to="/hot">热门</router-link>
+          </a-menu-item>
+          <a-menu-item key="4">
+            <router-link to="/category">分类</router-link>
+          </a-menu-item>
+          <a-menu-item key="5">
+            <router-link to="/about">关于</router-link>
+          </a-menu-item>
+        </a-menu>
+      </div>
+    </a-layout-header>
+    <a-layout-content :style="{ padding: '0 50px', marginTop: '64px' }">
+      <div :style="{ background: '#fff', padding: '24px', minHeight: '280px' }">
+        <router-view/>
+      </div>
+    </a-layout-content>
+    <a-layout-footer style="text-align: center">
+      ©MUYI Created by KebabShell
+    </a-layout-footer>
+  </a-layout>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+export default {
+  data() {
+    return {
+      loginFlag: false,
+      user: {
+        id: 1,
+        userName: 'test',
+        userAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+      }
+    };
+  },
+  mounted() {
+    // 验证用户是否登录及token的验证及拿到user的信息
+    let token = sessionStorage.getItem("Token");
+    if (token && this.tokenVerify(token)) {
+      this.loginFlag = true;
+      this.getUser(token);
+    }else {
+      this.loginFlag = false;
+    }
+  },
+  methods: {
+    getUser(token) {
+      this.user = {
+        id: 1,
+        userName: 'test1',
+        userAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+      }
+    },
+    tokenVerify(token) {
+      return true;
     }
   }
+}
+</script>
+
+<style scoped>
+.header-logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  line-height: 31px;
+  margin: 16px 24px 16px 0;
+  display: inline-block;
+  text-align: center;
+}
+
+.header-user {
+  float: right;
+  height: auto;
 }
 </style>
