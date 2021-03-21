@@ -1,6 +1,6 @@
 <template>
   <div style="text-align: center">
-    <a-card v-for="item in pics" :key="item.picId" hoverable style="width: 30%" class="card">
+    <a-card v-for="item in pics" :key="item.picId" hoverable style="width: 400px" class="card">
       <img slot="cover" alt="example" :src="item.thumbPic" @click="toPicDetail(item.picId)"/>
       <a-card-meta :title="item.authorName" :description="item.authorDesc">
         <a-avatar
@@ -22,6 +22,7 @@ export default {
   name: "All",
   data() {
     return {
+      pageNums: 1,
       pics: [
         {
           picId: 1,
@@ -93,6 +94,7 @@ export default {
     },
     // 拿到count数目的图片
     getMorePics(count){
+      this.pageNums++;
       let morePics = [
         {
           picId: 7,

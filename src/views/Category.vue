@@ -20,8 +20,8 @@
         <div class="sortPart">
           <h1>分类</h1>
           <a-checkbox-group
-              v-model="value"
-              :options="plainOptions"
+              v-model="sortValue"
+              :options="sortNames"
               @change="onChange"
           />
         </div>
@@ -35,8 +35,9 @@ export default {
   name: "Category",
   data() {
     return {
-      plainOptions: ['Apple', 'Pear', 'Orange', 'A','B','C','D','E'],
-      value: [],
+      pageNums: 1,
+      sortNames: ['Apple', 'Pear', 'Orange', 'A','B','C','D','E'],
+      sortValue: [],
       pics: [
         {
           picId: 1,
@@ -50,15 +51,30 @@ export default {
     }
   },
   created() {
-    this.getPics(1);
+    let sortName = this.$route.params.sortName;
+    let sortNames = [];
+    if (typeof (sortName) == 'undefined'){
+      // 从菜单栏过来的，没有带分类信息
+      console.log("undefined")
+      // 那就请求并渲染全部热门数据
+    }else {
+      // 有带分类信息
+      console.log("sortName:" + sortName)
+      sortNames.push(sortName);
+      // 请求并渲染此分类集合的热门数据
+    }
+    this.getPics(sortNames, 1);
   },
   methods: {
+    // 分类集合变化时
     onChange(checkedValues) {
       console.log('checked = ', checkedValues);
-      console.log('value = ', this.value);
+      console.log('value = ', this.sortValue);
+      // 通过选中的分类集合来请求图片
+      this.getPics(this.sortValue, 1);
     },
-    // 拿到count数目的图片
-    getPics(count){
+    // 拿到分类集合的count数目的图片
+    getPics(sortNames, count){
       this.pics = [
         {
           picId: 1,
@@ -112,6 +128,7 @@ export default {
     },
     // 拿到count数目的图片
     getMorePics(count){
+      this.pageNums++;
       let morePics = [
         {
           picId: 7,
@@ -169,7 +186,10 @@ export default {
 }
 .sortPart{
   position: fixed;
-  width: 250px;
-  padding: 20px;
+  width: 200px;
+  margin-top: 20px;
+  padding: 30px 20px 80px 20px;
+  border: 2px solid gray;
+  border-radius: 10px;
 }
 </style>

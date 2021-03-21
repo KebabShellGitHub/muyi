@@ -33,6 +33,7 @@ export default {
   name: "Hot",
   data() {
     return {
+      pageNums: 1,
       pics: [
         {
           picId: 1,
@@ -125,6 +126,7 @@ export default {
     },
     // 拿到count数目的图片
     getMorePics(count){
+      this.pageNums++;
       let morePics = [
         {
           picId: 7,

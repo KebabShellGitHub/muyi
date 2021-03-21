@@ -52,7 +52,7 @@
     </div>
     <div class="cpn-title">
       <h1>{{ hotSorts[0].sortName }}</h1>
-      <a-button type="link" size="small"
+      <a-button type="link" size="small" @click="toCategory(hotSorts[0].sortName)"
       >更多
         <a-icon type="right"/>
       </a-button>
@@ -374,6 +374,15 @@ export default {
         name: 'Author',
         params: {
           id: authorId
+        }
+      })
+    },
+    // 跳转到分类页面
+    toCategory(sortName){
+      this.$router.push({
+        name: 'Category',
+        params: {
+          sortName: sortName
         }
       })
     }
