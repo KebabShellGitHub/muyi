@@ -4,11 +4,17 @@ import router from "./router";
 import store from "./store";
 import "ant-design-vue/dist/antd.css";
 import Antd from "ant-design-vue";
+
 Vue.config.productionTip = false;
 
 Vue.use(Antd);
 new Vue({
-  router,
-  store,
-  render: h => h(App)
+    router,
+    store,
+    render: h => h(App)
 }).$mount("#app");
+
+// 跳转后返回顶部
+router.afterEach((to, from, next) => {
+    window.scrollTo(0, 0);
+})

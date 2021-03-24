@@ -371,7 +371,7 @@ export default {
     toAuthorDetail(authorId) {
       console.log(authorId);
       this.$router.push({
-        name: 'Author',
+        name: 'User',
         params: {
           id: authorId
         }

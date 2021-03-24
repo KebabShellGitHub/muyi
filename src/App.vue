@@ -10,7 +10,7 @@
     >
       <div class="ant-row">
         <div class="header-logo">
-          <h1>木易 MUYI</h1>
+          <h1><a style="color: gray" @click="toHome()">木易 MUYI</a></h1>
         </div>
         <div class="header-user">
           <router-link v-if="loginFlag" to="/user"
@@ -33,21 +33,11 @@
             :default-selected-keys="['1']"
             :style="{ lineHeight: '64px' }"
         >
-          <a-menu-item key="1">
-            <router-link to="/">首页</router-link>
-          </a-menu-item>
-          <a-menu-item key="2">
-            <router-link to="/hot">热门</router-link>
-          </a-menu-item>
-          <a-menu-item key="3">
-            <router-link to="/all">全部</router-link>
-          </a-menu-item>
-          <a-menu-item key="4">
-            <router-link to="/category">分类</router-link>
-          </a-menu-item>
-          <a-menu-item key="5">
-            <router-link to="/about">关于</router-link>
-          </a-menu-item>
+          <router-link to="/" class="route-link">首页</router-link>
+          <router-link to="/hot" class="route-link">热门</router-link>
+          <router-link to="/all" class="route-link">全部</router-link>
+          <router-link to="/category" class="route-link">分类</router-link>
+          <router-link to="/about" class="route-link">关于</router-link>
         </a-menu>
       </div>
     </a-layout-header>
@@ -100,6 +90,12 @@ export default {
     },
     toRegister(){
       this.$router.push('/register')
+    },
+    // 跳转到分类页面
+    toHome(){
+      this.$router.push({
+        name: 'Home',
+      })
     }
   }
 }
@@ -115,7 +111,10 @@ export default {
   display: inline-block;
   text-align: center;
 }
-
+.route-link {
+  margin-right: 20px;
+  color: slategray;
+}
 .header-user {
   float: right;
   height: auto;
