@@ -15,7 +15,7 @@
         <div class="header-user">
           <router-link v-if="token !== null" to="/user"
           >
-            <a-avatar size="small" style="backgroundColor:#87d068" icon="user"
+            <a-avatar size="small" style="background-color: gray" icon="user"
                       :src="'/api/pic/' + userAvatar"
             />
           </router-link>
@@ -79,16 +79,6 @@ export default {
     }
   },
   methods: {
-    getUser(token) {
-      // this.user = {
-      //   id: 1,
-      //   userName: 'test1',
-      //   userAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-      // }
-    },
-    tokenVerify(token) {
-      return true;
-    },
     toLogin(){
       this.$router.push('/login')
     },

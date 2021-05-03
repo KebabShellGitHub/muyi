@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="carPics.length !== 0">
     <div>
       <a-carousel autoplay>
         <!--     car:carousel走马灯     -->
@@ -12,25 +12,25 @@
       </a-carousel>
     </div>
     <!--  cpn:component  -->
-    <div class="cpn-title">
-      <h1>推荐</h1>
-      <a-button type="link" size="small"
-      >更多
-        <a-icon type="right"/>
-      </a-button>
-    </div>
-    <div class="all-card">
-      <a-card v-for="item in recPics" :key="item.picId" hoverable style="width: 300px" class="card">
-        <img slot="cover" alt="example" :src="item.thumbPic" @click="toPicDetail(item.picId)"/>
-        <a-card-meta :title="item.authorName" :description="item.authorDesc">
-          <a-avatar
-              slot="avatar"
-              :src="item.thumbAvatar"
-              @click="toAuthorDetail(item.authorId)"
-          />
-        </a-card-meta>
-      </a-card>
-    </div>
+    <!--<div class="cpn-title">-->
+    <!--  <h1>推荐</h1>-->
+    <!--  <a-button type="link" size="small"-->
+    <!--  >更多-->
+    <!--    <a-icon type="right"/>-->
+    <!--  </a-button>-->
+    <!--</div>-->
+    <!--<div class="all-card">-->
+    <!--  <a-card v-for="item in recPics" :key="item.picId" hoverable style="width: 300px" class="card">-->
+    <!--    <img slot="cover" alt="example" :src="item.thumbPic" @click="toPicDetail(item.picId)"/>-->
+    <!--    <a-card-meta :title="item.authorName" :description="item.authorDesc">-->
+    <!--      <a-avatar-->
+    <!--          slot="avatar"-->
+    <!--          :src="item.thumbAvatar"-->
+    <!--          @click="toAuthorDetail(item.authorId)"-->
+    <!--      />-->
+    <!--    </a-card-meta>-->
+    <!--  </a-card>-->
+    <!--</div>-->
     <div class="cpn-title">
       <h1>今日热门</h1>
       <a-button type="link" size="small"
@@ -136,7 +136,9 @@
   </div>
 </template>
 <script>
-import axios from "axios";
+import {getCarPic, getHotPics, getHotSortPics} from "@/apis/pic.api";
+import {getHotAuthor} from "@/apis/user.api";
+import {picDetail, authorDetail, category} from "@/apis/to.api";
 
 export default {
   data() {
@@ -170,127 +172,40 @@ export default {
       hotSort2Pics: [],
       // 热门分类3的4个图片
       hotSort3Pics: [],
-
-      // 摄影师
-      // author: {
-      //   id: 0,
-      //   name: '',
-      //   avatar: ''
-      // },
       // 热门摄影师的4个
       hotAuthors: []
     };
   },
-  created() {
-    this.getCarPics()
-    this.getRecPics()
-    this.getHotPics()
-    this.getHotSorts();
-    this.getHotAuthor()
+  mounted() {
+    this.homeInit()
   },
   methods: {
-    // 拿到走马灯的图片
-    async getCarPics() {
-      // axios请求拿到 getCarPics
-      this.$axios.get("/api/pic/hm/car?count=" + 5)
-      .then(res => {
-        this.carPics = res.data.data
+    homeInit: async function (){
+      await getCarPic(5).then(res => {
+        this.carPics = res.data
         this.carFirstPic = this.carPics.shift()
       })
-    },
-    // 拿到推荐图片
-    getRecPics() {
-      this.recPics = [
-        {
-          picId: 1,
-          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
-          authorName: 'author',
-          authorId: 0,
-          authorDesc: 'description'
-        },
-        {
-          picId: 2,
-          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
-          authorName: 'author',
-          authorId: 0,
-          authorDesc: 'description'
-        },
-        {
-          picId: 3,
-          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
-          authorName: 'author',
-          authorId: 0,
-          authorDesc: 'description'
-        },
-        {
-          picId: 4,
-          thumbAvatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-          thumbPic: 'https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png',
-          authorName: 'author',
-          authorId: 0,
-          authorDesc: 'description'
-        },
-      ];
-    },
-    // 拿到热门图片
-    getHotPics() {
-      this.$axios.get("/api/pic/hm/hot?count=" + 5)
-      .then(res => {
-        this.hotPics = res.data.data
-      }).catch(error => {
-        console.log("getHotPics error:" + error.message)
+      await getHotPics(8).then(res => {
+        this.hotPics = res.data
       })
-    },
-    // 拿到3个热门分类信息，再拿到分类下的热门图片
-    getHotSorts() {
-      this.getHotSortPics(["t1"]).then(res => { this.hotSort1Pics = res.data.data });
-      this.getHotSortPics(["t2"]).then(res => { this.hotSort2Pics = res.data.data });
-      this.getHotSortPics([]).then(res => { this.hotSort3Pics = res.data.data });
-    },
-    // 拿到某个分类的4张热门图片
-    getHotSortPics(sortName) {
-      // 根据分类id来拿到这个分类的4张热门图片
-      return this.$axios.get("/api/pic/hm/sort?sortName="
-          + sortName.join() + "&pageNum=1&count=4")
-    },
-    // 拿到4个热门摄影师的信息
-    getHotAuthor() {
-      this.$axios.get("/api/user/hm/hot?count=4")
-      .then(res => {
-        this.hotAuthors = res.data.data
+      await getHotSortPics(["t1"]).then(res => { this.hotSort1Pics = res.data });
+      await getHotSortPics(["t2"]).then(res => { this.hotSort2Pics = res.data });
+      await getHotSortPics([]).then(res => { this.hotSort3Pics = res.data });
+      await getHotAuthor(4).then(res => {
+        this.hotAuthors = res.data
       })
     },
     // 跳转到具体图片页面
     toPicDetail(picId) {
-      // console.log(picId);
-      this.$router.push({
-        name: 'PicDetail',
-        params: {
-          id: picId
-        }
-      })
+      picDetail(picId)
     },
     // 跳转到作者页面
     toAuthorDetail(authorId) {
-      // console.log(authorId);
-      this.$router.push({
-        name: 'User',
-        params: {
-          id: authorId
-        }
-      })
+      authorDetail(authorId)
     },
     // 跳转到分类页面
     toCategory(sortName){
-      this.$router.push({
-        name: 'Category',
-        params: {
-          sortName: sortName
-        }
-      })
+      category(sortName)
     }
   }
 };

@@ -2,10 +2,11 @@
   <div>
     <!--  大图  -->
     <div>
-      <img style="width: 100%" :src="picDetail.picDtl.picUrl ? ('/api/pic/' + picDetail.picDtl.picUrl) : ''"/>
+      <!--<img style="width: 100%" :src="picDetail.picDtl.picUrl ? ('/api/pic/' + picDetail.picDtl.picUrl) : ''"/>-->
+      <img v-if="picDetail.picDtl" style="width: 100%" :src="'/api/pic/' + picDetail.picDtl.picUrl"/>
     </div>
     <!--图片详细数据-->
-    <div class="pic-dtl">
+    <div class="pic-dtl" v-if="picDetail.picDtl">
       <a-row>
         <a-col :span="6">拍摄地点 - {{ picDetail.picDtl.picArea ? picDetail.picDtl.picArea : 'no info' }}</a-col>
         <a-col :span="6">拍摄日期 - {{ picDetail.picBase.gmtCreate ? picDetail.picBase.gmtCreate : 'no info' }}</a-col>
@@ -14,14 +15,14 @@
       </a-row>
     </div>
     <!--图片名+描述-->
-    <div class="pic-description">
+    <div class="pic-description" v-if="picDetail.picBase">
       <h1>{{ picDetail.picBase.picName ? picDetail.picBase.picName : 'no info' }}</h1>
       <p class="pic-description-font">
         {{ picDetail.picBase.picDescription ? picDetail.picBase.picDescription : 'no info' }}
       </p>
     </div>
     <!--  作者部分  -->
-    <div class="author">
+    <div class="author" v-if="authorBase.userDtl">
       <a-row>
         <!--作者头像-->
         <a-col :span="4" style="text-align: center">
@@ -43,14 +44,14 @@
           </a-row>
           <!--分类-->
           <a-row>
-            <a-button v-for="item in 5" :key="item" class="sort-btn">sort</a-button>
+            <a-button v-for="item in sorts" :key="item.categoryName" class="sort-btn">{{ item.categoryName }}</a-button>
           </a-row>
         </a-col>
       </a-row>
     </div>
-    <!--分类部分-->
+    <!--评论部分-->
     <div class="comm" v-if="commentsFlag">
-      <!--“分类”标题-->
+      <!--”评论“标题-->
       <h1 style="margin: 40px">Comments</h1>
       <!--v-for评论-->
       <div class="single-comm" v-for="item in this.comments" :key="item.commentBase.id">
@@ -87,10 +88,10 @@
           <a-comment>
             <div slot="content">
               <a-form-item>
-                <a-textarea :rows="4" />
+                <a-textarea v-model="newComm" :rows="4"/>
               </a-form-item>
               <a-form-item>
-                <a-button html-type="submit" type="primary">
+                <a-button html-type="submit" type="primary" @click="addComm(picDetail.picDtl.picId)">
                   Add Comment
                 </a-button>
               </a-form-item>
@@ -116,6 +117,11 @@
 
 <script>
 import statistic from "@/components/statistic";
+import {getPicDtl} from "@/apis/pic.api";
+import {addHit} from "@/apis/pic.statistic.api";
+import {getUser} from "@/apis/user.api";
+import {getPicSort} from "@/apis/category.api";
+import {getPicComm, addComm} from "@/apis/comment.api";
 
 export default {
   name: "PicDetail",
@@ -130,73 +136,74 @@ export default {
       comments: [],
       commentsFlag: false,
       commentCount: 4,
-      commentPageNum: 1
+      commentPageNum: 1,
+      newComm: ""
     }
   },
   components: {
     statistic
   },
-  created() {
-    let picId = this.$route.params.id;
-    this.picDetail.id = picId;
-    // console.log('id:' + this.$route.params.id);
-
-    // 通过图片id拿到图片详细信息
-    this.getPicDtl(picId)
-    .then(res => {
-      this.picDetail = res.data.data
-
-      let userId = this.picDetail.picBase.picAuthorId
-      this.getAuthor(userId).then(res => {
-        this.authorBase = res.data.data
-      })
-    })
-    // 通过图片id拿到所属分类
-    let sorts = [];
-    // 通过图片id拿到前N条评论
-    this.getComm(picId)
-    .then(res => {
-      this.comments = res.data.data
-      this.commentsFlag = true
-    })
-
+  mounted() {
+    this.picPageInit()
+  },
+  computed: {
+    getUserId() {
+      return this.$store.state.userId;
+    }
   },
   methods: {
-    getPicDtl(picId){
-      return this.$axios.get("/api/pic/one?picId=" + picId)
+    picPageInit: async function () {
+      let picId = this.$route.params.id;
+
+      // 为图片添加点击量
+      addHit(picId, this.getUserId).then(res => {
+        // console.log(res.msg)
+      })
+
+      // 通过图片id拿到图片详细信息
+      await getPicDtl(picId).then(res => {
+        this.picDetail = res.data
+
+        let userId = this.picDetail.picBase.picAuthorId
+        getUser(userId).then(res => {
+          this.authorBase = res.data
+        })
+      })
+      // 通过图片id拿到所属分类
+      await getPicSort(picId).then(res => {
+        this.sorts = res.data
+      })
+      // 通过图片id拿到前N条评论
+      await getPicComm(picId, this.commentPageNum, this.commentCount).then(res => {
+        if (res.code === 20000) {
+          this.comments = res.data
+          if (this.comments.length !== 0)
+            this.commentsFlag = true
+        }
+      })
+
     },
-    getAuthor(userId){
-      return this.$axios.get("/api/user/get", {
-        params: {
-          userId: userId
+    addComm(picId) {
+      let commentBase = {
+        commentContent: this.newComm,
+        commentUserId: this.getUserId,
+        commentPicId: picId
+      }
+      addComm(commentBase).then(res => {
+        if (res.code === 20000){
+        //  添加到评论末
+          // this.comments.push.apply(this.comments, res.data.data)
+          this.comments.push(res.data)
+          // console.log(this.comments)
+          this.commentsFlag = true
+        }else if (res.code === 20003){
+          this.$message.info("登录已过期")
+          sessionStorage.clear()
+          this.$store.dispatch("updateToken", null)
+          this.$router.push({ name: "Home" })
         }
       })
     },
-    /**
-     * 通过图片id拿到前count条评论
-     * @param picId
-     * @param count
-     */
-    getComm(picId) {
-      return this.$axios.get("/api/cm/get", {
-        params: {
-          picId: picId,
-          pageNum: this.commentPageNum,
-          count: this.commentCount
-        }
-      })
-    },
-    /**
-     * 通过图片id拿到更多count条评论
-     * @param picId
-     * @param count
-     * @param pageNums
-     */
-    getMoreComm(picId, count, pageNums) {
-      this.pageNums++;
-      let moreComm = [];
-      this.comments.push.apply(this.comments, moreComm);
-    }
   }
 };
 </script>
@@ -214,9 +221,11 @@ export default {
   padding: 20px;
   word-break: break-word;
 }
-.pic-description-font{
+
+.pic-description-font {
   font-size: 20px;
 }
+
 .author {
   margin-top: 20px;
   /*border: 1px solid gray;*/
@@ -244,10 +253,12 @@ export default {
 .sort-btn {
   margin: 5px;
 }
-.add-comm{
+
+.add-comm {
   padding: 20px;
 }
-.add-comm-other{
+
+.add-comm-other {
   margin: 30px;
   /*background-color: lightslategray;*/
   text-align: center;

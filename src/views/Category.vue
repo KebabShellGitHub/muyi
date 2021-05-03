@@ -33,6 +33,10 @@
 </template>
 
 <script>
+import {getPicInSorts} from "@/apis/pic.api";
+import {getAllSortInfo} from "@/apis/category.api";
+import {picDetail, authorDetail} from "@/apis/to.api";
+
 export default {
   name: "Category",
   data() {
@@ -40,26 +44,35 @@ export default {
       pageNum: 1,
       count: 3,
       pics: [],
-      sortNames: ['t1', 't2'],
+      sortNames: [],
       sortValue: [],
     }
   },
-  created() {
+  mounted() {
     let sortName = this.$route.params.sortName;
     let sortNames = [];
     if (typeof (sortName) == 'undefined') {
       // 从菜单栏过来的，没有带分类信息
-      console.log("undefined")
+      // console.log("undefined")
       // 那就请求并渲染全部热门数据
     } else {
       // 有带分类信息
-      console.log("sortName:" + sortName)
+      // console.log("sortName:" + sortName)
       sortNames.push(sortName);
       // 请求并渲染此分类集合的热门数据
     }
-    this.getPics(sortNames).then(res => {
-      this.pics = res.data.data
-    });
+    getPicInSorts(sortNames, 1, this.count).then(res => {
+      if (res.code === 20000) {
+        this.pageNum = 2
+        this.pics = res.data
+      }
+    })
+    getAllSortInfo().then(res => {
+      let categoryBaseList = res.data;
+      categoryBaseList.forEach(v => {
+        this.sortNames.push(v.categoryName)
+      })
+    })
   },
   methods: {
     // 分类集合变化时
@@ -67,43 +80,29 @@ export default {
       // console.log('checked = ', checkedValues);
       // console.log('value = ', this.sortValue);
       // 通过选中的分类集合来请求图片
-      this.getPics(this.sortValue).then(res => {
-        this.pics = res.data.data
-      });
-    },
-    // 拿到分类集合的count数目的图片
-    getPics(sortName) {
-      // 根据分类id来拿到这个分类的4张热门图片
-      return this.$axios.get("/api/pic/hm/sort?sortName="
-          + sortName.join() + "&pageNum=1&count=" + this.count)
+      getPicInSorts(this.sortValue, 1, this.count).then(res => {
+        if (res.code === 20000) {
+          this.pageNum = 2
+          this.pics = res.data
+        }
+      })
     },
     // 拿到更多图片
     getMorePics() {
-      this.pageNum++;
-      this.$axios.get("/api/pic/hm/sort?pageNum=" + this.pageNum + "&count=" + this.count)
-          .then(res => {
-            this.pics.push.apply(this.pics, res.data.data);
-          })
+      getPicInSorts(this.sortValue, this.pageNum, this.count).then(res => {
+        if (res.code === 20000 && Array.isArray(res.data) && res.data.length !== 0) {
+          this.pageNum++
+          this.pics.push.apply(this.pics, res.data);
+        }
+      })
     },
     // 跳转到具体图片页面
     toPicDetail(picId) {
-      console.log(picId);
-      this.$router.push({
-        name: 'PicDetail',
-        params: {
-          id: picId
-        }
-      })
+      picDetail(picId)
     },
     // 跳转到作者页面
     toAuthorDetail(authorId) {
-      console.log(authorId);
-      this.$router.push({
-        name: 'User',
-        params: {
-          id: authorId
-        }
-      })
+      authorDetail(authorId)
     }
   },
 };

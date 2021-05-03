@@ -6,29 +6,36 @@
       </a-col>
     </a-row>
     <a-form :form="form" :label-col="{ span: 8 }" :wrapper-col="{ span: 8 }" @submit="handleSubmit">
-      <a-form-item label="Note">
+      <a-form-item label="用户名">
         <a-input
-            v-decorator="['note', { rules: [{ required: true, message: 'Please input your note!' }] }]"
+            v-decorator="['userName', { rules: [{ required: true, message: 'Please input your note!' }] }]"
         />
       </a-form-item>
-      <a-form-item label="Note">
+      <a-form-item label="密码">
         <a-input
-            v-decorator="['note', { rules: [{ required: true, message: 'Please input your note!' }] }]"
+            type="password"
+            v-decorator="['password', { rules: [{ required: true, message: 'Please input your note!' }] }]"
         />
       </a-form-item>
-      <a-form-item label="Note">
+      <a-form-item label="二次密码">
         <a-input
-            v-decorator="['note', { rules: [{ required: true, message: 'Please input your note!' }] }]"
+            type="password"
+            v-decorator="['password_second', { rules: [{ required: true, message: 'Please input your note!' }] }]"
         />
       </a-form-item>
-      <a-form-item label="Note">
+      <a-form-item label="简介">
         <a-input
-            v-decorator="['note', { rules: [{ required: true, message: 'Please input your note!' }] }]"
+            v-decorator="['introduction', { rules: [{ required: false, message: 'Please input your note!' }] }]"
         />
       </a-form-item>
-      <a-form-item label="Note">
+      <a-form-item label="性别">
         <a-input
-            v-decorator="['note', { rules: [{ required: true, message: 'Please input your note!' }] }]"
+            v-decorator="['gender', { rules: [{ required: false, message: 'Please input your note!' }] }]"
+        />
+      </a-form-item>
+      <a-form-item label="邮箱">
+        <a-input
+            v-decorator="['email', { rules: [{ required: false, message: 'Please input your note!' }] }]"
         />
       </a-form-item>
       <a-form-item :wrapper-col="{ span: 16, offset: 8 }">
@@ -41,21 +48,48 @@
 </template>
 
 <script>
+import {register} from "@/apis/user.api";
+
 export default {
   data() {
     return {
       formLayout: 'horizontal',
-      form: this.$form.createForm(this, { name: 'coordinated' }),
+      form: this.$form.createForm(this, {name: 'coordinated'}),
     };
   },
   methods: {
     handleSubmit(e) {
       e.preventDefault();
-      this.form.validateFields((err, values) => {
-        if (!err) {
-          console.log('Received values of form: ', values);
+
+      // userName: this.form.getFieldValue('userName'),
+      //     userPassword: this.form.getFieldValue('userPassword')
+      // public class BigUserDTO {
+      //   private AuthUser authUser;
+      //   private UserBase userBase;
+      //   private UserDtl userDtl;
+      // }
+
+      let user = {
+        authUser: {
+          userName: this.form.getFieldValue('userName'),
+          userPassword: this.form.getFieldValue('password')
+        },
+        userBase: {
+          userName: this.form.getFieldValue('userName'),
+          userIntroduction: this.form.getFieldValue('introduction'),
+        },
+        userDtl: {
+          userGender: null,
+          userEmail: this.form.getFieldValue('email'),
         }
-      });
+      }
+      register(user).then(res => {
+        if (res.code === 20000){
+          this.$router.push({ name: "Login" })
+        }else {
+          this.$message.info(res.msg)
+        }
+      })
     },
   },
 };

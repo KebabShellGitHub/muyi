@@ -18,7 +18,7 @@
         </div>
         <div class="carPart">
           <a-icon type="file-text"/>
-          {{ item.statistic.commCount }}
+          {{ item.statistic.commentCount }}
         </div>
         <div class="carPart">
           <a-icon type="like"/>
@@ -34,53 +34,42 @@
 </template>
 
 <script>
+import {getAllHotPics} from "@/apis/pic.api";
+import {picDetail, authorDetail} from "@/apis/to.api";
+
 export default {
   name: "Hot",
   data() {
     return {
       pageNum: 1,
-      count: 6,
+      count: 3,
       pics: []
     }
   },
-  created() {
-    this.getPics();
+  mounted() {
+    getAllHotPics(this.pageNum, this.count).then(res => {
+      this.pics = res.data
+      this.pageNum++
+    })
   },
   methods: {
-    // 拿到count数目的图片
-    getPics() {
-      this.$axios.get("/api/pic/hot/all?pageNum=" + this.pageNum + "&count=" + this.count)
-          .then(res => {
-            this.pics = res.data.data
-          })
-    },
     // 拿到更多图片
     getMorePics() {
-      this.pageNum++;
-      this.$axios.get("/api/pic/hot/all?pageNum=" + this.pageNum + "&count=" + this.count)
-          .then(res => {
-            this.pics.push.apply(this.pics, res.data.data);
-          })
+      getAllHotPics(this.pageNum, this.count).then(res => {
+        if (Array.isArray(res.data) && res.data.length !== 0) {
+          this.pics.push.apply(this.pics, res.data);
+          this.pageNum++;
+        }
+      })
     },
     // 跳转到具体图片页面
     toPicDetail(picId) {
-      console.log(picId);
-      this.$router.push({
-        name: 'PicDetail',
-        params: {
-          id: picId
-        }
-      })
+      picDetail(picId)
     },
     // 跳转到作者页面
     toAuthorDetail(authorId) {
-      console.log(authorId);
-      this.$router.push({
-        name: 'User',
-        params: {
-          id: authorId
-        }
-      })
+      // console.log(authorId);
+      authorDetail(authorId)
     }
   }
 };

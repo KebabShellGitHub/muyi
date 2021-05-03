@@ -18,7 +18,6 @@
         />
       </a-form-item>
       <a-form-item :wrapper-col="{ span: 16, offset: 8 }">
-        <a-button style="margin-right: 20px">注册</a-button>
         <a-button type="primary" html-type="submit">
           登录
         </a-button>
@@ -39,13 +38,6 @@ export default {
     handleSubmit(e) {
       e.preventDefault();
 
-      // console.log(this.form.getFieldValue('userName'))
-      // console.log(this.form.getFieldValue('userPassword'))
-      // this.form.validateFields((err, values) => {
-      //   if (!err) {
-      //     console.log('Received values of form: ', values);
-      //   }
-      // });
       let user = {
         userName: this.form.getFieldValue('userName'),
         userPassword: this.form.getFieldValue('userPassword')

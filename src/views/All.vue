@@ -1,15 +1,5 @@
 <template>
   <div style="text-align: center">
-    <!--<a-card v-for="item in pics" :key="item.picId" hoverable style="width: 400px" class="card">-->
-    <!--  <img slot="cover" alt="example" :src="item.thumbPic" @click="toPicDetail(item.picId)"/>-->
-    <!--  <a-card-meta :title="item.authorName" :description="item.authorDesc">-->
-    <!--    <a-avatar-->
-    <!--        slot="avatar"-->
-    <!--        :src="item.thumbAvatar"-->
-    <!--        @click="toAuthorDetail(item.authorId)"-->
-    <!--    />-->
-    <!--  </a-card-meta>-->
-    <!--</a-card>-->
     <a-card v-for="item in pics" :key="item.pic.id" hoverable style="width: 400px" class="card">
       <img slot="cover" alt="example"
            :src="'/api/pic/' + item.pic.picThumbUrl"
@@ -30,6 +20,9 @@
 </template>
 
 <script>
+import {getAllPics} from "@/apis/pic.api";
+import {picDetail, authorDetail} from "@/apis/to.api";
+
 export default {
   name: "All",
   data() {
@@ -40,43 +33,28 @@ export default {
     }
   },
   created() {
-    this.getPics();
+    getAllPics(this.pageNum, this.count).then(res => {
+      this.pics = res.data
+      this.pageNum++
+    })
   },
   methods: {
-    // 拿到count数目的图片
-    getPics() {
-      this.$axios.get("/api/pic/all?pageNum=" + this.pageNum + "&count=" + this.count)
-          .then(res => {
-            this.pics = res.data.data
-          })
-    },
     // 拿到更多图片
     getMorePics() {
-      this.pageNum++;
-      this.$axios.get("/api/pic/all?pageNum=" + this.pageNum + "&count=" + this.count)
-          .then(res => {
-            this.pics.push.apply(this.pics, res.data.data);
-          })
+      getAllPics(this.pageNum, this.count).then(res => {
+        if (Array.isArray(res.data) && res.data.length !== 0) {
+          this.pageNum++
+          this.pics.push.apply(this.pics, res.data);
+        }
+      })
     },
     // 跳转到具体图片页面
     toPicDetail(picId) {
-      console.log(picId);
-      this.$router.push({
-        name: 'PicDetail',
-        params: {
-          id: picId
-        }
-      })
+      picDetail(picId)
     },
     // 跳转到作者页面
     toAuthorDetail(authorId) {
-      console.log(authorId);
-      this.$router.push({
-        name: 'User',
-        params: {
-          id: authorId
-        }
-      })
+      authorDetail(authorId)
     }
   }
 };
